@@ -1,0 +1,76 @@
+﻿@page "/books"
+@rendermode InteractiveServer
+
+@using Library.Domain.Entities
+@using Library.ServicesInterfaces
+
+<h3>Books</h3>
+
+<button class="btn btn-primary" @onclick="ShowAddModal">Add New Book</button>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>ISBN</th>
+            <th>Number of Pages</th>
+            <th>Language</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var book in books)
+        {
+            <tr>
+                <td>@book.Title</td>
+                <td>@book.ISBN</td>
+                <td>@book.NumberOfPages</td>
+                <td>@book.Language</td>
+                <td>
+                    <button class="btn btn-secondary" @onclick="() => ShowEditModal(book)">Edit</button>
+                    <button class="btn btn-danger" @onclick="() => DeleteBook(book)">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<AddEditBookModal @ref="addEditBookModal" OnSave="RefreshList" />
+
+@code {
+    [Inject] IBookService BookService { get; set; }
+
+    private List<Book> books;
+    private AddEditBookModal addEditBookModal;
+
+    protected override void OnInitialized()
+    {
+        LoadBooks();
+    }
+
+    private void LoadBooks()
+    {
+        books = BookService.GetList(string.Empty);
+    }
+
+    private void ShowAddModal()
+    {
+        addEditBookModal.Show(new Book());
+    }
+
+    private void ShowEditModal(Book book)
+    {
+        addEditBookModal.Show(book);
+    }
+
+    private void DeleteBook(Book book)
+    {
+        BookService.Delete(book);
+        LoadBooks();
+    }
+
+    private void RefreshList()
+    {
+        LoadBooks();
+    }
+}

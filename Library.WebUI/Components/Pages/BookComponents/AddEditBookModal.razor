@@ -1,0 +1,74 @@
+﻿@using Library.Domain.Entities
+@using Library.ServicesInterfaces
+
+
+@if (isVisible)
+{
+    <div class="modal show" tabindex="-1" style="display: block;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@((book.Id == 0) ? "Add Book" : "Edit Book")</h5>
+                    <button type="button" class="btn-close" aria-label="Close" @onclick="Cancel"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="title" @bind="book.Title">
+                    </div>
+                    <div class="mb-3">
+                        <label for="isbn" class="form-label">ISBN</label>
+                        <input type="text" class="form-control" id="isbn" @bind="book.ISBN">
+                    </div>
+                    <div class="mb-3">
+                        <label for="numberOfPages" class="form-label">Number of Pages</label>
+                        <input type="number" class="form-control" id="numberOfPages" @bind="book.NumberOfPages">
+                    </div>
+                    <div class="mb-3">
+                        <label for="language" class="form-label">Language</label>
+                        <input type="text" class="form-control" id="language" @bind="book.Language">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+                    <button type="button" class="btn btn-primary" @onclick="Save">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    
+    [Parameter] public EventCallback OnSave { get; set; }
+    [Inject] public IBookService BookService { get; set; }
+    
+    private bool isVisible;
+    private Book book = new();
+
+    public void Show(Book book)
+    {
+        this.book = book;
+        isVisible = true;
+    }
+
+    private void Save()
+    {
+        if (book.Id == 0)
+        {
+            BookService.Save(book);
+        }
+        else
+        {
+            BookService.Update(book);
+        }
+
+        isVisible = false;
+        OnSave.InvokeAsync();
+    }
+
+    private void Cancel()
+    {
+        isVisible = false;
+    }
+}
