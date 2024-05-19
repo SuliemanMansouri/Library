@@ -5,14 +5,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Library.Services
 {
-    public class BookService(IDbContextFactory<LibraryContext> dbContextFactory) : IBookService
+    public class BookService : IBookService
     {
-        private readonly IDbContextFactory<LibraryContext> _contextFactory = dbContextFactory;
+        private readonly IDbContextFactory<LibraryContext> _contextFactory;
+
+        public BookService(IDbContextFactory<LibraryContext> dbContextFactory)
+        {
+            _contextFactory = dbContextFactory;
+        }
 
         public void Save(Book book)
         {
             using var db = _contextFactory.CreateDbContext();
+            
             var tmp = db.Books.FirstOrDefault(x => x.Id == book.Id);
+            
             if (tmp == null)
             {
                 db.Books.Add(book);
@@ -26,6 +33,7 @@ namespace Library.Services
             using var db = (_contextFactory.CreateDbContext());
 
             var tmp = db.Books.FirstOrDefault(x => x.Id == book.Id);
+            
             if (tmp != null)
             {
                 tmp.Title = book.Title;
@@ -42,6 +50,7 @@ namespace Library.Services
             using var db = _contextFactory.CreateDbContext();
 
             var tmp = db.Books.FirstOrDefault(x => x.Id == book.Id);
+            
             if (tmp != null)
             {
                 db.Books.Remove(tmp);
@@ -61,7 +70,7 @@ namespace Library.Services
         {
             using var db = _contextFactory.CreateDbContext();
 
-            var book = db.Books.FirstOrDefault(x => x.ISBN == isbn);
+            var book = db.Books.FirstOrDefault(x => x.ISBN.ToUpper() == isbn.Trim().ToUpper());
             return book;
         }
 
@@ -71,6 +80,13 @@ namespace Library.Services
 
             var books = db.Books.Where(x => x.Title.Contains(title));
             return [.. books];
+        }
+
+        public List<Book> GetAll()
+        {
+            using var db = _contextFactory.CreateDbContext();
+
+            return [.. db.Books];
         }
     }
 }

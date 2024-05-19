@@ -5,21 +5,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Library.Services
 {
-    public class AuthorService(IDbContextFactory<LibraryContext> contextFactory) : IAuthorService
+    public class AuthorService : IAuthorService
     {
-        private readonly IDbContextFactory<LibraryContext> _contextFactory = contextFactory;
+        private readonly IDbContextFactory<LibraryContext> _contextFactory;
 
-        public void Delete(Author author)
+        public AuthorService(IDbContextFactory<LibraryContext> contextFactory)
         {
-            using var db = _contextFactory.CreateDbContext();
-
-            var tmp = db.Authors.FirstOrDefault(x => x.Id == author.Id);
-            if (tmp != null)
-            {
-                db.Authors.Remove(tmp);
-                db.SaveChanges();
-            }
+            _contextFactory = contextFactory;
         }
+
 
         public Author Get(int id)
         {
@@ -40,14 +34,15 @@ namespace Library.Services
         public void Save(Author author)
         {
             using var db = _contextFactory.CreateDbContext();
+            
             var tmp = db.Authors.FirstOrDefault(x => x.Id == author.Id);
+            
             if (tmp == null)
             {
                 db.Authors.Add(author);
                 db.SaveChanges();
             }
         }
-
         public void Update(Author author)
         {
             using var db = _contextFactory.CreateDbContext();
@@ -62,6 +57,24 @@ namespace Library.Services
 
                 db.SaveChanges();
             }
+        }
+        public void Delete(Author author)
+        {
+            using var db = _contextFactory.CreateDbContext();
+
+            var tmp = db.Authors.FirstOrDefault(x => x.Id == author.Id);
+            if (tmp != null)
+            {
+                db.Authors.Remove(tmp);
+                db.SaveChanges();
+            }
+        }
+
+        public List<Author> GetAll()
+        {
+            using var db = _contextFactory.CreateDbContext();
+
+            return db.Authors.ToList();
         }
     }
 }

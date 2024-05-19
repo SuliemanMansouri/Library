@@ -10,5 +10,6 @@ namespace Library.ServicesInterfaces
         List<Book> GetList(string title);
         void Save(Book book);
         void Update(Book book);
+        List<Book> GetAll();
     }
 }

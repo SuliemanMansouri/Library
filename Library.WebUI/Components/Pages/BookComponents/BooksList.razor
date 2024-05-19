@@ -41,6 +41,7 @@
     [Inject] IBookService BookService { get; set; }
 
     private List<Book> books;
+
     private AddEditBookModal addEditBookModal;
 
     protected override void OnInitialized()
@@ -50,7 +51,7 @@
 
     private void LoadBooks()
     {
-        books = BookService.GetList(string.Empty);
+        books = BookService.GetAll();
     }
 
     private void ShowAddModal()
