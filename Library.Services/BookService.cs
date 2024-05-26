@@ -14,7 +14,7 @@ namespace Library.Services
             _contextFactory = dbContextFactory;
         }
 
-        public void Save(Book book)
+        public async Task Save(Book book)
         {
             using var db = _contextFactory.CreateDbContext();
             
@@ -23,12 +23,12 @@ namespace Library.Services
             if (tmp == null)
             {
                 db.Books.Add(book);
-                db.SaveChanges();
+                await db.SaveChangesAsync();
             }
 
         }
 
-        public void Update(Book book)
+        public async Task Update(Book book)
         {
             using var db = (_contextFactory.CreateDbContext());
 
@@ -41,11 +41,11 @@ namespace Library.Services
                 tmp.NumberOfPages = book.NumberOfPages;
                 tmp.Language = book.Language;
 
-                db.SaveChanges();
+                await db.SaveChangesAsync();
             }
         }
 
-        public void Delete(Book book)
+        public async Task Delete(Book book)
         {
             using var db = _contextFactory.CreateDbContext();
 
@@ -54,31 +54,31 @@ namespace Library.Services
             if (tmp != null)
             {
                 db.Books.Remove(tmp);
-                db.SaveChanges();
+                await db.SaveChangesAsync();
             }
         }
 
-        public Book Get(int id)
+        public async Task<Book> Get(int id)
         {
             using var db = _contextFactory.CreateDbContext();
 
-            var book = db.Books.FirstOrDefault(x => x.Id == id);
+            var book = await db.Books.FirstOrDefaultAsync(x => x.Id == id);
             return book;
         }
 
-        public Book Get(string isbn)
+        public async Task<Book> Get(string isbn)
         {
             using var db = _contextFactory.CreateDbContext();
 
-            var book = db.Books.FirstOrDefault(x => x.ISBN.ToUpper() == isbn.Trim().ToUpper());
+            var book = await db.Books.FirstOrDefaultAsync(x => x.ISBN.ToUpper() == isbn.Trim().ToUpper());
             return book;
         }
 
-        public List<Book> GetList(string title)
+        public async Task<List<Book>> GetList(string title)
         {
             using var db = _contextFactory.CreateDbContext();
 
-            var books = db.Books.Where(x => x.Title.Contains(title));
+            var books = await db.Books.Where(x => x.Title.Contains(title)).ToListAsync();
             return [.. books];
         }
 

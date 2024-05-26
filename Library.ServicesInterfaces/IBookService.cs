@@ -4,12 +4,12 @@ namespace Library.ServicesInterfaces
 {
     public interface IBookService
     {
-        void Delete(Book book);
-        Book Get(int id);
-        Book Get(string isbn);
-        List<Book> GetList(string title);
-        void Save(Book book);
-        void Update(Book book);
+        Task Delete(Book book);
+        Task<Book> Get(int id);
+        Task<Book> Get(string isbn);
+        Task<List<Book>> GetList(string title);
+        Task Save(Book book);
+        Task Update(Book book);
         Task<List<Book>> GetAll();
     }
 }
