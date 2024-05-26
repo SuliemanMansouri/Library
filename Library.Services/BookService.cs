@@ -82,11 +82,11 @@ namespace Library.Services
             return [.. books];
         }
 
-        public List<Book> GetAll()
+        public async Task<List<Book>> GetAll()
         {
             using var db = _contextFactory.CreateDbContext();
 
-            return [.. db.Books];
+            return [.. await db.Books.ToListAsync()];
         }
     }
 }
