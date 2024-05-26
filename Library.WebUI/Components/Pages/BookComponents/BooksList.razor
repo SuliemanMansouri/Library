@@ -8,32 +8,41 @@
 
 <button class="btn btn-primary" @onclick="ShowAddModal">Add New Book</button>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>ISBN</th>
-            <th>Number of Pages</th>
-            <th>Language</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var book in books)
-        {
+<br />
+
+@if (books == null)
+{
+    <span>Loading...</span>
+}
+else
+{
+    <table class="table">
+        <thead>
             <tr>
-                <td>@book.Title</td>
-                <td>@book.ISBN</td>
-                <td>@book.NumberOfPages</td>
-                <td>@book.Language</td>
-                <td>
-                    <button class="btn btn-secondary" @onclick="() => ShowEditModal(book)">Edit</button>
-                    <button class="btn btn-danger" @onclick="() => DeleteBook(book)">Delete</button>
-                </td>
+                <th>Title</th>
+                <th>ISBN</th>
+                <th>Number of Pages</th>
+                <th>Language</th>
+                <th>Actions</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var book in books)
+            {
+                <tr>
+                    <td>@book.Title</td>
+                    <td>@book.ISBN</td>
+                    <td>@book.NumberOfPages</td>
+                    <td>@book.Language</td>
+                    <td>
+                        <button class="btn btn-secondary" @onclick="() => ShowEditModal(book)">Edit</button>
+                        <button class="btn btn-danger" @onclick="() => DeleteBook(book)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 
 <AddEditBookModal @ref="addEditBookModal" OnSave="RefreshList" />
 
@@ -44,14 +53,14 @@
 
     private AddEditBookModal addEditBookModal;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        LoadBooks();
+        await LoadBooks();
     }
 
-    private void LoadBooks()
+    private async Task LoadBooks()
     {
-        books = BookService.GetAll();
+        books = await BookService.GetAll();
     }
 
     private void ShowAddModal()
