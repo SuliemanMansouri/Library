@@ -1,0 +1,75 @@
+﻿@page "/books"
+@rendermode InteractiveServer
+
+@using Library.Domain.Entities
+@using Library.ServicesInterfaces
+
+<h3>Books</h3>
+
+<div style="float:inline-end">
+    <FluentButton Appearance="Appearance.Accent" @onclick="ShowAddModal">Add New Book</FluentButton>
+</div>
+
+<br />
+
+@if (books == null)
+{
+    <span>Loading...</span>
+}
+else
+{
+
+    <FluentDataGrid Items="@books">
+        <PropertyColumn Property="@(p=>p.Title)" Sortable="true"/>
+        <PropertyColumn Property="@(p=>p.ISBN)" Sortable="true"/>
+        <PropertyColumn Property="@(p=>p.NumberOfPages)" Sortable="true"/>
+        <PropertyColumn Property="@(p=>p.Language)" Sortable="true"/>
+        <TemplateColumn Title="Actions" Align="@Align.End">
+            <FluentButton aria-label="Edit item" IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => ShowEditModal(context))" />
+            <FluentButton aria-label="Delete item" IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => DeleteBook(context))" />
+        </TemplateColumn>
+    </FluentDataGrid>
+
+    
+}
+
+@* <AddEditBookModal @ref="addEditBookModal" OnSave="RefreshList" /> *@
+
+@code {
+    [Inject] IBookService BookService { get; set; }
+
+    private IQueryable<Book> books;
+
+    //private AddEditBookModal addEditBookModal;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadBooks();
+    }
+
+    private async Task LoadBooks()
+    {
+        books = (await BookService.GetAll()).AsQueryable();
+    }
+
+    private void ShowAddModal()
+    {
+        //addEditBookModal.Show(new Book());
+    }
+
+    private void ShowEditModal(Book book)
+    {
+        //addEditBookModal.Show(book);
+    }
+
+    private void DeleteBook(Book book)
+    {
+        BookService.Delete(book);
+        LoadBooks();
+    }
+
+    private void RefreshList()
+    {
+        LoadBooks();
+    }
+}

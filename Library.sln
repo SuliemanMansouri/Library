@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Library.ServicesInterfaces"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Library.Services", "Library.Services\Library.Services.csproj", "{6E976754-2525-4077-A543-1FE31561C085}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Library.FluentUI", "Library.FluentUI\Library.FluentUI.csproj", "{054C0669-5D44-4A4E-A2D6-248FF36B816B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{6E976754-2525-4077-A543-1FE31561C085}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6E976754-2525-4077-A543-1FE31561C085}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6E976754-2525-4077-A543-1FE31561C085}.Release|Any CPU.Build.0 = Release|Any CPU
+		{054C0669-5D44-4A4E-A2D6-248FF36B816B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{054C0669-5D44-4A4E-A2D6-248FF36B816B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{054C0669-5D44-4A4E-A2D6-248FF36B816B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{054C0669-5D44-4A4E-A2D6-248FF36B816B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
