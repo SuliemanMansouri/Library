@@ -15,23 +15,23 @@ namespace Library.Services
         }
 
 
-        public Author Get(int id)
+        public async Task<Author> Get(int id)
         {
             using var db = _contextFactory.CreateDbContext();
 
-            var author = db.Authors.FirstOrDefault(x => x.Id == id);
+            var author = await db.Authors.FirstOrDefaultAsync(x => x.Id == id);
             return author;
         }
 
-        public List<Author> GetList(string name)
+        public async Task<List<Author>> GetList(string name)
         {
             using var db = _contextFactory.CreateDbContext();
 
             var authors = db.Authors.Where(x => x.Name.Contains(name));
-            return [.. authors];
+            return [.. await authors.ToListAsync()];
         }
 
-        public void Save(Author author)
+        public async Task Save(Author author)
         {
             using var db = _contextFactory.CreateDbContext();
             
@@ -40,10 +40,10 @@ namespace Library.Services
             if (tmp == null)
             {
                 db.Authors.Add(author);
-                db.SaveChanges();
+                await db.SaveChangesAsync();
             }
         }
-        public void Update(Author author)
+        public async Task Update(Author author)
         {
             using var db = _contextFactory.CreateDbContext();
 
@@ -55,10 +55,10 @@ namespace Library.Services
                 tmp.Phone = author.Phone;
                 tmp.Name = author.Name;
 
-                db.SaveChanges();
+                await db.SaveChangesAsync();
             }
         }
-        public void Delete(Author author)
+        public async Task Delete(Author author)
         {
             using var db = _contextFactory.CreateDbContext();
 
@@ -66,15 +66,15 @@ namespace Library.Services
             if (tmp != null)
             {
                 db.Authors.Remove(tmp);
-                db.SaveChanges();
+                await db.SaveChangesAsync();
             }
         }
 
-        public List<Author> GetAll()
+        public async Task<List<Author>> GetAll()
         {
             using var db = _contextFactory.CreateDbContext();
 
-            return db.Authors.ToList();
+            return await db.Authors.ToListAsync();
         }
     }
 }

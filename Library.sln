@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Library.ServicesInterfaces"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Library.Services", "Library.Services\Library.Services.csproj", "{6E976754-2525-4077-A543-1FE31561C085}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Library.FluentUI", "Library.FluentUI\Library.FluentUI.csproj", "{054C0669-5D44-4A4E-A2D6-248FF36B816B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Library.FluentUI", "Library.FluentUI\Library.FluentUI.csproj", "{054C0669-5D44-4A4E-A2D6-248FF36B816B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

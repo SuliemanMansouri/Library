@@ -1,0 +1,60 @@
+﻿@using Library.Domain.Entities
+@using Library.ServicesInterfaces
+@implements IDialogContentComponent
+@inject IAuthorService AuthorService
+
+<FluentDialogHeader ShowDismiss="true">
+    <h5 class="modal-title">@((Content.Id == 0) ? "Add Author" : "Edit Author")</h5>
+</FluentDialogHeader>
+
+<FluentDialogBody>
+    <FluentGrid>
+        <FluentGridItem xs="12">
+            <FluentGrid>
+                <FluentGridItem xs="12" sm="6" md="6" lg="6">
+                    <FluentTextField @bind-Value="@Content.Name" style="width:100%">Name</FluentTextField>
+                </FluentGridItem>
+                <FluentGridItem xs="12" sm="6" md="6" lg="6">
+                    <FluentTextField @bind-Value="@Content.Phone" style="width:100%">Phone</FluentTextField>
+                </FluentGridItem>
+                <FluentGridItem xs="12" sm="6" md="6" lg="6">
+                    <FluentTextField @bind-Value="@Content.Email" style="width:100%">Email</FluentTextField>
+                </FluentGridItem>
+            </FluentGrid>
+        </FluentGridItem>
+    </FluentGrid>
+</FluentDialogBody>
+
+<FluentDialogFooter>
+    <FluentButton Appearance="Appearance.Neutral" @onclick="Cancel">Cancel</FluentButton>
+    <FluentButton Appearance="Appearance.Accent" @onclick="SaveAsync">Save</FluentButton>
+</FluentDialogFooter>
+
+@code {
+
+
+    [Parameter] public Author Content { get; set; } = new();
+    [CascadingParameter] public FluentDialog Dialog { get; set; }
+
+   
+
+    private async Task SaveAsync()
+    {
+        if (Content.Id == 0)
+        {
+            await AuthorService.Save(Content);
+        }
+        else
+        {
+            await AuthorService.Update(Content);
+        }
+
+        await Dialog.CloseAsync(Content);
+    }
+
+    private async void Cancel()
+    {
+        await Dialog.CloseAsync();
+    }
+
+}

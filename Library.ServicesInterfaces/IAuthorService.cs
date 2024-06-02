@@ -4,11 +4,11 @@ namespace Library.ServicesInterfaces
 {
     public interface IAuthorService
     {
-        void Delete(Author author);
-        Author Get(int id);
-        List<Author> GetList(string name);
-        List<Author> GetAll();
-        void Save(Author author);
-        void Update(Author author);
+        Task Delete(Author author);
+        Task<Author> Get(int id);
+        Task<List<Author>> GetList(string name);
+        Task<List<Author>> GetAll();
+        Task Save(Author author);
+        Task Update(Author author);
     }
 }

@@ -11,5 +11,7 @@ namespace Library.ServicesInterfaces
         Task Save(Book book);
         Task Update(Book book);
         Task<List<Book>> GetAll();
+        Task AddAuthorToBook(Book book, Author author);
+        Task RemoveAuthorFromBook(Book book, Author author);
     }
 }

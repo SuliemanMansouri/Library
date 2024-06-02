@@ -1,5 +1,6 @@
 ﻿@page "/books"
 @rendermode InteractiveServer
+@inject IDialogService DialogService
 
 @using Library.Domain.Entities
 @using Library.ServicesInterfaces
@@ -19,28 +20,29 @@
 else
 {
 
-    <FluentDataGrid Items="@books">
-        <PropertyColumn Property="@(p=>p.Title)" Sortable="true"/>
-        <PropertyColumn Property="@(p=>p.ISBN)" Sortable="true"/>
-        <PropertyColumn Property="@(p=>p.NumberOfPages)" Sortable="true"/>
-        <PropertyColumn Property="@(p=>p.Language)" Sortable="true"/>
+    <FluentDataGrid Items="@books" ResizableColumns=true Pagination="@pagination" Style="width: 100%; height: 405px;overflow:auto;">
+        <PropertyColumn Property="@(p=>p.Title)" Sortable="true" />
+        <PropertyColumn Property="@(p=>p.ISBN)" Sortable="true" />
+        <PropertyColumn Property="@(p=>p.NumberOfPages)" Sortable="true" />
+        <PropertyColumn Property="@(p=>p.Language)" Sortable="true" />
         <TemplateColumn Title="Actions" Align="@Align.End">
-            <FluentButton aria-label="Edit item" IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => ShowEditModal(context))" />
+            <FluentButton aria-label="Edit item" IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => OpenDialogAsync(context))" />
             <FluentButton aria-label="Delete item" IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => DeleteBook(context))" />
         </TemplateColumn>
     </FluentDataGrid>
 
-    
+    <FluentPaginator State="@pagination" />
+
+
 }
 
-@* <AddEditBookModal @ref="addEditBookModal" OnSave="RefreshList" /> *@
+
 
 @code {
     [Inject] IBookService BookService { get; set; }
-
     private IQueryable<Book> books;
-
-    //private AddEditBookModal addEditBookModal;
+    private AddEditBookDialog addEditBookDialog;
+    PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
 
     protected override async Task OnInitializedAsync()
     {
@@ -50,26 +52,45 @@ else
     private async Task LoadBooks()
     {
         books = (await BookService.GetAll()).AsQueryable();
+       
     }
 
+    private async Task OpenDialogAsync(Book book)
+    {
+        DialogParameters parameters = new DialogParameters()
+            {
+                Title = ((book.Id == 0) ? "Add Book" : "Edit Book"),
+                PrimaryAction = "Yes",
+                PrimaryActionEnabled = false,
+                SecondaryAction = "No",
+                Width = "2000px",
+                TrapFocus = true,
+                Modal = true,
+                PreventScroll = true
+            };
+        var dialog = await DialogService.ShowDialogAsync<AddEditBookDialog>(book, parameters);
+        var result = await dialog.Result;
+
+        if (!result.Cancelled && result.Data != null)
+        {
+            book = (Book)result.Data;
+            await LoadBooks();
+        }
+
+    }
     private void ShowAddModal()
     {
-        //addEditBookModal.Show(new Book());
+        Task.Run(() => OpenDialogAsync(new Book()));
     }
 
-    private void ShowEditModal(Book book)
-    {
-        //addEditBookModal.Show(book);
-    }
-
-    private void DeleteBook(Book book)
+    private async void DeleteBook(Book book)
     {
         BookService.Delete(book);
-        LoadBooks();
+        await LoadBooks();
     }
 
-    private void RefreshList()
+    private async void RefreshList()
     {
-        LoadBooks();
+        await LoadBooks();
     }
 }

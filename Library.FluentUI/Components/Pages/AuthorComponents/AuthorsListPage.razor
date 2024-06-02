@@ -1,0 +1,96 @@
+﻿@page "/authors"
+@rendermode InteractiveServer
+@inject IDialogService DialogService
+
+@using Library.Domain.Entities
+@using Library.ServicesInterfaces
+
+<h3>Authors</h3>
+
+<div style="float:inline-end">
+    <FluentButton Appearance="Appearance.Accent" @onclick="ShowAddModal">Add New Author</FluentButton>
+</div>
+
+<br />
+
+@if (authors == null)
+{
+    <span>Loading...</span>
+}
+else
+{
+
+    <FluentDataGrid Items="@authors" ResizableColumns=true Pagination="@pagination" Style="width: 100%; height: 405px;overflow:auto;">
+        <PropertyColumn Property="@(p=>p.Name)" Sortable="true" />
+        <PropertyColumn Property="@(p=>p.Phone)" Sortable="true" />
+        <PropertyColumn Property="@(p=>p.Email)" Sortable="true" />
+        <TemplateColumn Title="Actions" Align="@Align.End">
+            <FluentButton aria-label="Edit item" IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => OpenDialogAsync(context))" />
+            <FluentButton aria-label="Delete item" IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => DeleteAuthor(context))" />
+        </TemplateColumn>
+    </FluentDataGrid>
+
+    <FluentPaginator State="@pagination" />
+
+
+}
+
+
+
+@code {
+    [Inject] IAuthorService AuthorService { get; set; }
+
+    private IQueryable<Author> authors;
+
+    private AddEditAuthorDialog addEditAuthorDialog;
+
+    PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAuthors();
+    }
+
+    private async Task LoadAuthors()
+    {
+        authors = (await AuthorService.GetAll()).AsQueryable();
+    }
+
+    private async Task OpenDialogAsync(Author author)
+    {
+        DialogParameters parameters = new DialogParameters()
+            {
+                Title = ((author.Id == 0) ? "Add Author" : "Edit Author"),
+                PrimaryAction = "Yes",
+                PrimaryActionEnabled = false,
+                SecondaryAction = "No",
+                Width = "2000px",
+                TrapFocus = true,
+                Modal = true,
+                PreventScroll = true
+            };
+        var dialog = await DialogService.ShowDialogAsync<AddEditAuthorDialog>(author, parameters);
+        var result = await dialog.Result;
+        if (!result.Cancelled && result.Data != null)
+        {
+            author = (Author)result.Data;
+            await LoadAuthors();
+        }
+
+
+    }
+    private void ShowAddModal()
+    {
+        Task.Run(() => OpenDialogAsync(new Author()));
+    }
+
+    private async void DeleteAuthor(Author author)
+    {
+        AuthorService.Delete(author);
+        await LoadAuthors();
+    }
+
+    private async void RefreshList()
+    {
+        await LoadAuthors();
+    }
+}

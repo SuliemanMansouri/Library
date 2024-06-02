@@ -86,7 +86,43 @@ namespace Library.Services
         {
             using var db = _contextFactory.CreateDbContext();
 
-            return [.. await db.Books.ToListAsync()];
+            return [.. await db.Books.Include(x=>x.Authors).ToListAsync()];
+        }
+
+        public async Task AddAuthorToBook(Book book, Author author)
+        {
+            using var db = _contextFactory.CreateDbContext();
+            var tmpBook = db.Books.Include(x=>x.Authors).FirstOrDefault(x=>x.Id == book.Id);
+            if (tmpBook != null)
+            {
+                var tmpAuthor = db.Authors.FirstOrDefault(x=>x.Id ==author.Id); 
+                if (tmpAuthor != null)
+                {
+                    tmpBook.Authors.Add(tmpAuthor);
+                }
+                else
+                {
+                    db.Authors.Add(author);
+                    await db.SaveChangesAsync();
+                    tmpBook.Authors.Add(author);
+                }
+                await db.SaveChangesAsync();
+            }
+        }
+
+        public async Task RemoveAuthorFromBook(Book book, Author author)
+        {
+            using var db = _contextFactory.CreateDbContext();
+            var tmpBook = db.Books.Include(x=>x.Authors).FirstOrDefault(x=>x.Id == book.Id);
+            if (tmpBook != null)
+            {
+                var bookAuthor = tmpBook.Authors.FirstOrDefault(x=>x.Id == author.Id);
+                if (bookAuthor != null)
+                {
+                    tmpBook.Authors.Remove(bookAuthor);
+                    await db.SaveChangesAsync();
+                }
+            }
         }
     }
 }

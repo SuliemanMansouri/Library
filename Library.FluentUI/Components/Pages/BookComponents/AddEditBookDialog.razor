@@ -1,0 +1,128 @@
+﻿@using Library.Domain.Entities
+@using Library.FluentUI.Components.Pages.AuthorComponents
+@using Library.ServicesInterfaces
+@implements IDialogContentComponent
+@inject IBookService BookService
+@inject IAuthorService AuthorService
+@inject IDialogService DialogService
+@inject NavigationManager NavigationManager
+
+<FluentDialogHeader ShowDismiss="true">
+    <h5 class="modal-title">@((Content.Id == 0) ? "Add Book" : "Edit Book")</h5>
+</FluentDialogHeader>
+
+<FluentDialogBody>
+    <FluentGrid>
+        <FluentGridItem xs="12" md="8">
+            <FluentGrid>
+                <FluentGridItem xs="12" sm="6" md="6" lg="6">
+                    <FluentTextField @bind-Value="@Content.Title" style="width:100%">Title</FluentTextField>
+                </FluentGridItem>
+                <FluentGridItem xs="12" sm="6" md="6" lg="6">
+                    <FluentTextField @bind-Value="@Content.ISBN" style="width:100%">ISBN</FluentTextField>
+                </FluentGridItem>
+                <FluentGridItem xs="12" sm="6" md="6" lg="6">
+                    <FluentNumberField @bind-Value="@Content.NumberOfPages" style="width:100%">NumberOfPages</FluentNumberField>
+                </FluentGridItem>
+                <FluentGridItem xs="12" sm="6" md="6" lg="6">
+                    <FluentTextField @bind-Value="@Content.Language" style="width:100%">Language</FluentTextField>
+                </FluentGridItem>
+                <FluentGridItem xs="12" sm="6" md="6" lg="6">
+                    <FluentListbox Items="AvailableAuthors"
+                                   OptionText="@(i=>i.Name)"
+                                   OptionValue="@(i=>i.Id.ToString())"
+                                   @bind-SelectedOption="@SelectedAuthor"
+                                   style="width:100%"
+                                   Label="Available Authors">
+                        <OptionTemplate>
+                            <FluentButton IconEnd="@(new Icons.Regular.Size16.AddCircle())"
+                                          @onclick="@(()=>AddToBook(@context))" />
+                            @context.Name
+                        </OptionTemplate>
+                    </FluentListbox>
+                </FluentGridItem>
+
+                <FluentGridItem xs="12" sm="6" md="6" lg="6">
+                    <FluentListbox Items="Content.Authors"
+                                   OptionText="@(i=>i.Name)"
+                                   OptionValue="@(i=>i.Id.ToString())"
+                                   @bind-SelectedOption="@SelectedAuthor"
+                                   style="width:100%"
+                                   Label="Book's Authors">
+                        <OptionTemplate>
+                            <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())"
+                                          @onclick="@(()=>RemoveFromBook(@context))" />
+                            @context.Name
+                        </OptionTemplate>
+
+                    </FluentListbox>
+                </FluentGridItem>
+            </FluentGrid>
+        </FluentGridItem>
+
+
+    </FluentGrid>
+
+</FluentDialogBody>
+
+<FluentDialogFooter>
+    <FluentButton Appearance="Appearance.Stealth" @onclick="OpenAuthors">Authors</FluentButton>
+    <FluentButton Appearance="Appearance.Neutral" @onclick="Cancel">Cancel</FluentButton>
+    <FluentButton Appearance="Appearance.Accent" @onclick="SaveAsync">Save</FluentButton>
+</FluentDialogFooter>
+
+@code {
+
+
+    [Parameter] public Book Content { get; set; } = new();
+    [CascadingParameter] public FluentDialog Dialog { get; set; }
+
+    public Author SelectedAuthor { get; set; } = new();
+    public List<Author> AvailableAuthors { get; set; } = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        AvailableAuthors = await AuthorService.GetAll();
+    }
+    private async Task SaveAsync()
+    {
+        if (Content.Id == 0)
+        {
+            await BookService.Save(Content);
+        }
+        else
+        {
+            await BookService.Update(Content);
+        }
+
+        await Dialog.CloseAsync(Content);
+    }
+
+    private async void Cancel()
+    {
+        await Dialog.CloseAsync();
+    }
+
+    private async void AddToBook(Author author)
+    {
+        await BookService.AddAuthorToBook(Content, author);
+        Content.Authors.Add(author);
+        StateHasChanged();
+
+    }
+
+    private async void RemoveFromBook(Author author)
+    {
+        await BookService.RemoveAuthorFromBook(Content, author);
+        Content.Authors.Remove(author);
+        StateHasChanged();
+
+
+
+    }
+    private void OpenAuthors()
+    {
+        NavigationManager.NavigateTo("/authors");
+    }
+    
+}
