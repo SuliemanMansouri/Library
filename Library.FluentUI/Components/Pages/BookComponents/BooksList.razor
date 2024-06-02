@@ -20,7 +20,7 @@
 else
 {
 
-    <FluentDataGrid Items="@books" ResizableColumns=true Pagination="@pagination" Style="width: 100%; height: 405px;overflow:auto;">
+    <FluentDataGrid Items="@books" GenerateHeader="GenerateHeaderOption.Sticky" ResizableColumns=true Pagination="@pagination" Style="width: 100%; height: 405px;overflow:auto;">
         <PropertyColumn Property="@(p=>p.Title)" Sortable="true" />
         <PropertyColumn Property="@(p=>p.ISBN)" Sortable="true" />
         <PropertyColumn Property="@(p=>p.NumberOfPages)" Sortable="true" />
@@ -36,12 +36,10 @@ else
 
 }
 
-
-
 @code {
     [Inject] IBookService BookService { get; set; }
     private IQueryable<Book> books;
-    private AddEditBookDialog addEditBookDialog;
+    private AddEditBookDialog addEditBookDialog ;
     PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
 
     protected override async Task OnInitializedAsync()
@@ -52,7 +50,7 @@ else
     private async Task LoadBooks()
     {
         books = (await BookService.GetAll()).AsQueryable();
-       
+        StateHasChanged();
     }
 
     private async Task OpenDialogAsync(Book book)
@@ -73,19 +71,18 @@ else
 
         if (!result.Cancelled && result.Data != null)
         {
-            book = (Book)result.Data;
             await LoadBooks();
         }
 
     }
-    private void ShowAddModal()
+    private async Task ShowAddModal()
     {
-        Task.Run(() => OpenDialogAsync(new Book()));
+        await OpenDialogAsync(new Book());
     }
 
     private async void DeleteBook(Book book)
     {
-        BookService.Delete(book);
+        await BookService.Delete(book);
         await LoadBooks();
     }
 

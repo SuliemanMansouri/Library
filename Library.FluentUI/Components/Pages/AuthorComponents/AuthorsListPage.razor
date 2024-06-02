@@ -20,7 +20,11 @@
 else
 {
 
-    <FluentDataGrid Items="@authors" ResizableColumns=true Pagination="@pagination" Style="width: 100%; height: 405px;overflow:auto;">
+    <FluentDataGrid Items="@authors" 
+        GenerateHeader="GenerateHeaderOption.Sticky" 
+        ResizableColumns=true Pagination="@pagination" 
+        Style="width: 100%; height: 500px;overflow:auto;">
+
         <PropertyColumn Property="@(p=>p.Name)" Sortable="true" />
         <PropertyColumn Property="@(p=>p.Phone)" Sortable="true" />
         <PropertyColumn Property="@(p=>p.Email)" Sortable="true" />
@@ -28,6 +32,7 @@ else
             <FluentButton aria-label="Edit item" IconEnd="@(new Icons.Regular.Size16.Edit())" OnClick="@(() => OpenDialogAsync(context))" />
             <FluentButton aria-label="Delete item" IconEnd="@(new Icons.Regular.Size16.Delete())" OnClick="@(() => DeleteAuthor(context))" />
         </TemplateColumn>
+    
     </FluentDataGrid>
 
     <FluentPaginator State="@pagination" />
@@ -45,6 +50,7 @@ else
     private AddEditAuthorDialog addEditAuthorDialog;
 
     PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
+
     protected override async Task OnInitializedAsync()
     {
         await LoadAuthors();
@@ -52,7 +58,9 @@ else
 
     private async Task LoadAuthors()
     {
+
         authors = (await AuthorService.GetAll()).AsQueryable();
+        StateHasChanged();              
     }
 
     private async Task OpenDialogAsync(Author author)
@@ -73,19 +81,19 @@ else
         if (!result.Cancelled && result.Data != null)
         {
             author = (Author)result.Data;
-            await LoadAuthors();
+            LoadAuthors();
         }
 
 
     }
-    private void ShowAddModal()
+    private async Task ShowAddModal()
     {
-        Task.Run(() => OpenDialogAsync(new Author()));
+        await OpenDialogAsync(new Author());
     }
 
     private async void DeleteAuthor(Author author)
     {
-        AuthorService.Delete(author);
+        await AuthorService.Delete(author);
         await LoadAuthors();
     }
 
