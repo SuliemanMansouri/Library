@@ -1,7 +1,7 @@
 ﻿@page "/authors"
 @rendermode InteractiveServer
 @inject IDialogService DialogService
-
+@inject IAuthorService AuthorService
 @using Library.Domain.Entities
 @using Library.ServicesInterfaces
 
@@ -43,11 +43,10 @@ else
 
 
 @code {
-    [Inject] IAuthorService AuthorService { get; set; }
+    
+    private IQueryable<Author>? authors;
 
-    private IQueryable<Author> authors;
-
-    private AddEditAuthorDialog addEditAuthorDialog;
+    private AddEditAuthorDialog? addEditAuthorDialog;
 
     PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
 
@@ -81,7 +80,7 @@ else
         if (!result.Cancelled && result.Data != null)
         {
             author = (Author)result.Data;
-            LoadAuthors();
+            await LoadAuthors();
         }
 
 
