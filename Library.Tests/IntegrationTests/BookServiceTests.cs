@@ -3,11 +3,6 @@ using Library.Persistance;
 using Library.Services;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Library.Tests.IntegrationTests
 {
@@ -122,7 +117,7 @@ namespace Library.Tests.IntegrationTests
             var options = CreateNewContextOptions();
             var factory = GetDbContextFactory(options);
             var service = new BookService(factory);
-            var book = new Book { Title = "Book1", ISBN = "1234567890", NumberOfPages = 500, Language = "Arabic" };
+            var book = new Book {Id = 1, Title = "Book1", ISBN = "1234567890", NumberOfPages = 500, Language = "Arabic" };
             await service.Save(book);
 
             // Act

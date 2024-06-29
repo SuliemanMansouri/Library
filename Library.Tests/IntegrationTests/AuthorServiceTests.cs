@@ -3,11 +3,14 @@ using Library.Persistance;
 using Library.Services;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using Shouldly;
 
 namespace Library.Tests.IntegrationTests
 {
     public class AuthorServiceTests
     {
+        private readonly IDbContextFactory<LibraryContext> _factory;
+
         private DbContextOptions<LibraryContext> CreateNewContextOptions()
         {
             return new DbContextOptionsBuilder<LibraryContext>()
@@ -15,12 +18,11 @@ namespace Library.Tests.IntegrationTests
                 .Options;
         }
 
-        private IDbContextFactory<LibraryContext> GetDbContextFactoryAsync(DbContextOptions<LibraryContext> options)
+        private IDbContextFactory<LibraryContext> GetDbContextFactory(DbContextOptions<LibraryContext> options)
         {
-            var mockDbFactory = new Mock<IDbContextFactory<LibraryContext>>();
-            mockDbFactory.Setup(f => f.CreateDbContext()).Returns(() => new LibraryContext(options));
-            return mockDbFactory.Object;
-
+            var mockFactory = new Mock<IDbContextFactory<LibraryContext>>();
+            mockFactory.Setup(f => f.CreateDbContext()).Returns(() => new LibraryContext(options));
+            return mockFactory.Object;
         }
 
         [Fact]
@@ -28,7 +30,7 @@ namespace Library.Tests.IntegrationTests
         {
             // Arrange
             var options = CreateNewContextOptions();
-            var factory = GetDbContextFactoryAsync(options);
+            var factory = GetDbContextFactory(options);
             var service = new AuthorService(factory);
             var author = new Author { Name = "Author1", Phone = "123456789", Email = "author@company.com" };
 
@@ -46,7 +48,7 @@ namespace Library.Tests.IntegrationTests
         {
             // Arrange
             var options = CreateNewContextOptions();
-            var factory = GetDbContextFactoryAsync(options);
+            var factory = GetDbContextFactory(options);
             var service = new AuthorService(factory);
             var author = new Author { Name = "Author1", Phone = "123456789", Email = "author@company.com" };
             await service.Save(author);
@@ -64,7 +66,7 @@ namespace Library.Tests.IntegrationTests
         {
             // Arrange
             var options = CreateNewContextOptions();
-            var factory = GetDbContextFactoryAsync(options);
+            var factory = GetDbContextFactory(options);
             var service = new AuthorService(factory);
             await service.Save(new Author { Name = "Author1", Phone = "123456789", Email = "author@company.com" });
             await service.Save(new Author { Name = "Author2", Phone = "123456789", Email = "author@company.com" });
@@ -81,16 +83,17 @@ namespace Library.Tests.IntegrationTests
         {
             // Arrange
             var options = CreateNewContextOptions();
-            var factory = GetDbContextFactoryAsync(options);
+            var factory = GetDbContextFactory(options);
             var service = new AuthorService(factory);
             await service.Save(new Author {Name = "Author1", Phone = "123456789", Email = "author@company.com" });
+            await service.Save(new Author {Name = "Author2", Phone = "123456789", Email = "author@company.com" });
             await service.Save(new Author {Name = "Author2", Phone = "123456789", Email = "author@company.com" });
 
             // Act
             var authors = await service.GetAll();
 
             // Assert
-            Assert.Equal(2, authors.Count);
+            Assert.Equal(3, authors.Count);
         }
 
         [Fact]
@@ -98,7 +101,7 @@ namespace Library.Tests.IntegrationTests
         {
             // Arrange
             var options = CreateNewContextOptions();
-            var factory = GetDbContextFactoryAsync(options);
+            var factory = GetDbContextFactory(options);
             var service = new AuthorService(factory);
             var author = new Author {Name = "Author1", Phone = "123456789", Email = "author@company.com" };
             await service.Save(author);
@@ -109,7 +112,9 @@ namespace Library.Tests.IntegrationTests
             // Assert
             using var context = new LibraryContext(options);
             var deletedAuthor = await context.Authors.FindAsync(author.Id);
-            Assert.Null(deletedAuthor);
+            
+            deletedAuthor.ShouldBe(null);
+
         }
 
         [Fact]
@@ -117,7 +122,7 @@ namespace Library.Tests.IntegrationTests
         {
             // Arrange
             var options = CreateNewContextOptions();
-            var factory = GetDbContextFactoryAsync(options);
+            var factory = GetDbContextFactory(options);
             var service = new AuthorService(factory);
             var author = new Author { Name = "Author1", Email = "author1@example.com", Phone = "1234567890" };
             await service.Save(author);

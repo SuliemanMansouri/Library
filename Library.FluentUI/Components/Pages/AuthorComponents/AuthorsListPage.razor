@@ -2,6 +2,7 @@
 @rendermode InteractiveServer
 @inject IDialogService DialogService
 @inject IAuthorService AuthorService
+
 @using Library.Domain.Entities
 @using Library.ServicesInterfaces
 
@@ -44,9 +45,9 @@ else
 
 @code {
     
-    private IQueryable<Author>? authors;
+    public IQueryable<Author>? authors;
 
-    private AddEditAuthorDialog? addEditAuthorDialog;
+    public AddEditAuthorDialog? addEditAuthorDialog;
 
     PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
 
